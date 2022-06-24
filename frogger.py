@@ -59,15 +59,14 @@ class Car(Sprite):
 
     def update(self):
         self.x += self.dx
-        if (self.x < -400):
+        
+        if self.x < -400:
             self.x = 400
-        if (self.x > 400):
+        elif self.x > 400:
             self.x = -400
     
 
 player = Player(0, -300, 40, 40, image_dir + "frog.gif")
-player.render(pen)
-
 car_left = Car(0, -250, 121, 40, image_dir + "car_left.gif", -5)
 car_right = Car(0, -200, 121, 40, image_dir + "car_right.gif", 5)
 
@@ -84,14 +83,9 @@ while True:
     car_left.update()
     car_right.update()
 
-    if player.is_collision(car_left):
-        player.x = 0
-        player.y = -300
-    if player.is_collision(car_right):
+    if player.is_collision(car_left) or player.is_collision(car_right):
         player.x = 0
         player.y = -300
     
     wn.update()
     pen.clear()
-
-wn.mainloop()
