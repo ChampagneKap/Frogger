@@ -1,6 +1,7 @@
 import turtle
 import math
 import time
+import random
 
 image_dir = "/Users/kacper/Downloads/VSCode Practice/hello/Frogger/"
 
@@ -92,9 +93,9 @@ class Turtle(Sprite):
         Sprite.__init__(self, x, y, width, height, image)
         self.dx = dx
         self.state = "full"
-        self.full_time = 10
-        self.half_time = 5
-        self.submerged_time = 5
+        self.full_time = random.randint(8,12)
+        self.half_time = random.randint(4,6)
+        self.submerged_time = random.randint(4,6)
         self.start_time = time.time()
 
     def update(self):
@@ -110,7 +111,7 @@ class Turtle(Sprite):
                 self.image = image_dir + "turtle_right.gif"
             else:
                 self.image = image_dir + "turtle_left.gif"
-        elif self.state == "half":
+        elif self.state.__contains__("half"):
             if self.dx > 0:
                 self.image = image_dir + "turtle_right_half.gif"
             else:
@@ -119,12 +120,15 @@ class Turtle(Sprite):
             self.image = image_dir + "turtle_submerged.gif"
 
         if self.state == "full" and time.time() - self.start_time > self.full_time:
-            self.state = "half"
+            self.state = "half_down"
             self.start_time = time.time()
-        elif self.state == "half" and time.time() - self.start_time > self.half_time:
+        elif self.state == "half_down" and time.time() - self.start_time > self.half_time:
             self.state = "submerged"
             self.start_time = time.time()
         elif self.state == "submerged" and time.time() - self.start_time > self.submerged_time:
+            self.state = "half_up"
+            self.start_time = time.time()
+        elif self.state == "half_up" and time.time() - self.start_time > self.half_time:
             self.state = "full"
             self.start_time = time.time()
 
@@ -163,7 +167,7 @@ while True:
             elif isinstance(sprite, Log):
                 player.dx = sprite.dx
                 break
-            elif isinstance(sprite, Turtle):
+            elif isinstance(sprite, Turtle) and sprite.state != "submerged":
                 player.dx = sprite.dx
                 break
     
