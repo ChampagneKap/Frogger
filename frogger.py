@@ -1,5 +1,6 @@
 import turtle
 import math
+import time
 
 image_dir = "/Users/kacper/Downloads/VSCode Practice/hello/Frogger/"
 
@@ -10,7 +11,7 @@ wn.setup(600, 800)
 wn.bgcolor("black")
 wn.tracer(0)
 
-shapes = ["frog.gif", "car_right.gif", "car_left.gif", "log_full.gif", "turtle_left.gif", "turtle_right.gif"]
+shapes = ["frog.gif", "car_right.gif", "car_left.gif", "log_full.gif", "turtle_left.gif", "turtle_right.gif", "turtle_left_half.gif", "turtle_right_half.gif", "turtle_submerged.gif"]
 for shape in shapes:
     wn.register_shape(image_dir + shape)
 
@@ -90,6 +91,11 @@ class Turtle(Sprite):
     def __init__(self, x, y, width, height, image, dx):
         Sprite.__init__(self, x, y, width, height, image)
         self.dx = dx
+        self.state = "full"
+        self.full_time = 10
+        self.half_time = 5
+        self.submerged_time = 5
+        self.start_time = time.time()
 
     def update(self):
         self.x += self.dx
@@ -98,6 +104,30 @@ class Turtle(Sprite):
             self.x = 400
         elif self.x > 400:
             self.x = -400
+
+        if self.state == "full":
+            if self.dx > 0:
+                self.image = image_dir + "turtle_right.gif"
+            else:
+                self.image = image_dir + "turtle_left.gif"
+        elif self.state == "half":
+            if self.dx > 0:
+                self.image = image_dir + "turtle_right_half.gif"
+            else:
+                self.image = image_dir + "turtle_left_half.gif"
+        else:
+            self.image = image_dir + "turtle_submerged.gif"
+
+        if self.state == "full" and time.time() - self.start_time > self.full_time:
+            self.state = "half"
+            self.start_time = time.time()
+        elif self.state == "half" and time.time() - self.start_time > self.half_time:
+            self.state = "submerged"
+            self.start_time = time.time()
+        elif self.state == "submerged" and time.time() - self.start_time > self.submerged_time:
+            self.state = "full"
+            self.start_time = time.time()
+
     
 
 player = Player(0, -300, 40, 40, image_dir + "frog.gif")
