@@ -9,6 +9,7 @@ wn.bgcolor("black")
 wn.tracer(0)
 
 wn.register_shape(image_dir + "frog.gif")
+wn.register_shape(image_dir + "car_left.gif")
 
 pen = turtle.Turtle()
 pen.speed(0)
@@ -43,8 +44,16 @@ class Player(Sprite):
     def left(self):
         self.x -= 45
 
+class Car(Sprite):
+    def __init__(self, x, y, width, height, image, dx):
+        Sprite.__init__(self, x, y, width, height, image)
+        self.dx = dx
+    
+
 player = Player(0, -300, 40, 40, image_dir + "frog.gif")
 player.render(pen)
+
+car_left = Car(0, -255, 40, 121, image_dir + "car_left.gif", 45)
 
 wn.listen()
 wn.onkeypress(player.up, "Up")
@@ -54,6 +63,7 @@ wn.onkeypress(player.left, "Left")
 
 while True:
     player.render(pen)
+    car_left.render(pen)
     wn.update()
     pen.clear()
 
