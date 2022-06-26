@@ -9,16 +9,17 @@ wn = turtle.Screen()
 wn.cv._rootwindow.resizable(False, False)
 wn.title("Frogger")
 wn.setup(600, 800)
-wn.bgcolor("black")
+wn.bgcolor("green")
 wn.tracer(0)
 
-shapes = ["frog.gif", "car_right.gif", "car_left.gif", "log_full.gif", "turtle_left.gif", "turtle_right.gif", "turtle_left_half.gif", "turtle_right_half.gif", "turtle_submerged.gif"]
+shapes = ["frog.gif", "car_right.gif", "car_left.gif", "log_full.gif", "turtle_left.gif", "turtle_right.gif", "turtle_left_half.gif", "turtle_right_half.gif", "turtle_submerged.gif", "goal.gif"]
 for shape in shapes:
     wn.register_shape(image_dir + shape)
 
 pen = turtle.Turtle()
 pen.speed(0)
 pen.hideturtle()
+pen.penup()
 
 class Sprite():
     def __init__(self, x, y, width, height, image):
@@ -37,6 +38,9 @@ class Sprite():
         x_collision = (math.fabs(self.x - other.x) * 2) < (self.width + other.width)
         y_collision = (math.fabs(self.y - other.y) * 2) < (self.height + other.height)
         return (x_collision and y_collision)
+
+    def update(self):
+        pass
 
 class Player(Sprite):
     def __init__(self, x, y, width, height, image):
@@ -135,14 +139,27 @@ class Turtle(Sprite):
     
 
 player = Player(0, -300, 40, 40, image_dir + "frog.gif")
-car_left = Car(0, -250, 121, 40, image_dir + "car_left.gif", -1)
-car_right = Car(0, -200, 121, 40, image_dir + "car_right.gif", 1)
-log_right = Log(0, -150, 121, 40, image_dir + "log_full.gif", 2)
-log_left = Log(0, -100, 121, 40, image_dir + "log_full.gif", -2)
-turtle_right = Turtle(0, -50, 121, 40, image_dir + "turtle_right.gif", 1.5)
-turtle_left = Turtle(0, 0, 121, 40, image_dir + "turtle_left.gif", -1.5)
 
-sprites = [car_left, car_right, log_left, log_right, turtle_right, turtle_left]
+car_left = Car(0, -250, 121, 40, image_dir + "car_left.gif", -random.uniform(0.5,2.0))
+car_right = Car(0, -200, 121, 40, image_dir + "car_right.gif", random.uniform(0.5,2.0))
+car_left_2 = Car(0, -150, 121, 40, image_dir + "car_left.gif", -random.uniform(0.5,2.0))
+car_right_2 = Car(0, -100, 121, 40, image_dir + "car_right.gif", random.uniform(0.5,2.0))
+car_left_3 = Car(0, -50, 121, 40, image_dir + "car_left.gif", -random.uniform(0.5,2.0))
+
+log_right = Log(0, 50, 121, 40, image_dir + "log_full.gif", random.uniform(1.5,2.5))
+log_left = Log(0, 150, 121, 40, image_dir + "log_full.gif", -random.uniform(1.5,2.5))
+log_right_2 = Log(0, 250, 250, 40, image_dir + "log_full.gif", random.uniform(1.5,2.5))
+
+turtle_right = Turtle(0, 100, 155, 40, image_dir + "turtle_right.gif", random.uniform(1.0,1.5))
+turtle_left = Turtle(0, 200, 250, 40, image_dir + "turtle_left.gif", -random.uniform(1.0,1.5))
+
+goal_1 = Sprite(0, 300, 50, 50, "goal.gif")
+goal_2 = Sprite(-100, 300, 50, 50, "goal.gif")
+goal_3 = Sprite(-200, 300, 50, 50, "goal.gif")
+goal_4 = Sprite(-300, 300, 50, 50, "goal.gif")
+goal_5 = Sprite(-400, 300, 50, 50, "goal.gif")
+
+sprites = [car_left, car_right, car_left_2, car_right_2, car_left_3, log_left, log_right, log_right_2, turtle_right, turtle_left, goal_1, goal_2, goal_3, goal_4, goal_5]
 sprites.append(player)
 
 wn.listen()
