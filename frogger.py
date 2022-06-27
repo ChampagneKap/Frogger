@@ -13,7 +13,7 @@ wn.bgcolor("green")
 #wn.bgpic(image_dir + "background.gif")
 wn.tracer(0)
 
-shapes = ["frog.gif", "car_right.gif", "car_left.gif", "log_full.gif", "turtle_left.gif", "turtle_right.gif", "turtle_left_half.gif", "turtle_right_half.gif", "turtle_submerged.gif", "goal.gif", "frog_home.gif"]
+shapes = ["frog.gif", "car_right.gif", "car_left.gif", "log_full.gif", "turtle_left.gif", "turtle_right.gif", "turtle_left_half.gif", "turtle_right_half.gif", "turtle_submerged.gif", "goal.gif", "frog_home.gif", "frog_small.gif"]
 for shape in shapes:
     wn.register_shape(image_dir + shape)
 
@@ -48,6 +48,11 @@ class Player(Sprite):
         Sprite.__init__(self, x, y, width, height, image)
         self.dx = 0
         self.collision = False
+        self.frogs_home = 0
+        self.time_remaining = 60
+        self.max_time = 60
+        self.start_time = time.time()
+        self.lives = 3
 
     def up(self):
         self.y += 50
@@ -65,8 +70,20 @@ class Player(Sprite):
         self.x += self.dx
 
         if self.x < -300 or self.x > 300 or self.y < -300:
-            self.x = 0
-            self.y = -300
+            self.go_home()
+
+        self.time_remaining = self.max_time - round(time.time() - self.start_time)
+
+        if self.time_remaining <= 0:
+            player.lives -= 1
+            self.go_home()
+
+    def go_home(self):
+        self.dx = 0
+        self.x = 0
+        self.y = -300
+        self.time_remaining = 60
+        self.start_time = time.time()
 
 class Car(Sprite):
     def __init__(self, x, y, width, height, image, dx):
@@ -142,28 +159,71 @@ class Home(Sprite):
     def __init__(self, x, y, width, height, image):
         Sprite.__init__(self, x, y, width, height, image)
 
+class Timer():
+    def __init__(self, max_time):
+        self.x = 200
+        self.y = -350
+        self.max_time = max_time
+        self.width = 200
+
+    def render(self, time, pen):
+        pen.color("red")
+        pen.pensize(5)
+        pen.penup()
+        pen.goto(self.x, self.y)
+        pen.pendown()
+        percent = time/self.max_time
+        dx = percent * self.width
+        pen.goto(self.x - dx, self.y)
+        pen.penup()
+
 player = Player(0, -300, 40, 40, image_dir + "frog.gif")
+timer = Timer(60)
+car_speed = random.uniform(1.0,2.0)
+log_speed = random.uniform(1.5,2.5)
+turtle_speed = random.uniform(1.0,1.5)
 
-car_left = Car(0, -250, 121, 40, image_dir + "car_left.gif", -random.uniform(0.5,2.0))
-car_right = Car(0, -200, 121, 40, image_dir + "car_right.gif", random.uniform(0.5,2.0))
-car_left_2 = Car(0, -150, 121, 40, image_dir + "car_left.gif", -random.uniform(0.5,2.0))
-car_right_2 = Car(0, -100, 121, 40, image_dir + "car_right.gif", random.uniform(0.5,2.0))
-car_left_3 = Car(0, -50, 121, 40, image_dir + "car_left.gif", -random.uniform(0.5,2.0))
+level_1 = [
+    Car(0, -250, 121, 40, image_dir + "car_left.gif", -car_speed),
+    Car(random.randint(100, 200) + 121, -250, 121, 40, image_dir + "car_left.gif", -car_speed),
 
-log_right = Log(0, 50, 121, 40, image_dir + "log_full.gif", random.uniform(1.5,2.5))
-log_left = Log(0, 150, 121, 40, image_dir + "log_full.gif", -random.uniform(1.5,2.5))
-log_right_2 = Log(0, 250, 250, 40, image_dir + "log_full.gif", random.uniform(1.5,2.5))
+    Car(0, -200, 121, 40, image_dir + "car_right.gif", car_speed),
+    Car(random.randint(100, 200) + 121, -200, 121, 40, image_dir + "car_right.gif", car_speed),
 
-turtle_right = Turtle(0, 100, 155, 40, image_dir + "turtle_right.gif", random.uniform(1.0,1.5))
-turtle_left = Turtle(0, 200, 250, 40, image_dir + "turtle_left.gif", -random.uniform(1.0,1.5))
+    Car(0, -150, 121, 40, image_dir + "car_left.gif", -car_speed),
+    Car(random.randint(100, 200) + 121, -150, 121, 40, image_dir + "car_left.gif", -car_speed),
 
-home_1 = Home(0, 300, 50, 50, image_dir + "goal.gif")
-home_2 = Home(-100, 300, 50, 50, image_dir + "goal.gif")
-home_3 = Home(-200, 300, 50, 50, image_dir + "goal.gif")
-home_4 = Home(100, 300, 50, 50, image_dir + "goal.gif")
-home_5 = Home(200, 300, 50, 50, image_dir + "goal.gif")
+    Car(0, -100, 121, 40, image_dir + "car_right.gif", car_speed),
+    Car(random.randint(100, 200) + 121, -100, 121, 40, image_dir + "car_right.gif", car_speed),
 
-sprites = [car_left, car_right, car_left_2, car_right_2, car_left_3, log_left, log_right, log_right_2, turtle_right, turtle_left, home_1, home_2, home_3, home_4, home_5]
+    Car(0, -50, 121, 40, image_dir + "car_left.gif", -car_speed),
+    Car(random.randint(100, 200) + 121, -50, 121, 40, image_dir + "car_left.gif", -car_speed),
+
+    Log(0, 50, 161, 40, image_dir + "log_full.gif", log_speed),
+    Log(random.randint(100, 200) + 161, 50, 161, 40, image_dir + "log_full.gif", log_speed),
+
+    Log(0, 150, 161, 40, image_dir + "log_full.gif", -log_speed),
+    Log(random.randint(100, 200) + 161, 150, 161, 40, image_dir + "log_full.gif", -log_speed),
+
+    Log(0, 250, 161, 40, image_dir + "log_full.gif", log_speed),
+    Log(random.randint(100, 200) + 161, 250, 161, 40, image_dir + "log_full.gif", log_speed),
+
+    Turtle(0, 100, 155, 40, image_dir + "turtle_right.gif", turtle_speed),
+    Turtle(random.randint(100, 200) + 155, 100, 155, 40, image_dir + "turtle_right.gif", turtle_speed),
+
+    Turtle(0, 200, 250, 40, image_dir + "turtle_left.gif", -turtle_speed),
+    Turtle(random.randint(100, 200) + 155, 200, 250, 40, image_dir + "turtle_left.gif", -turtle_speed)
+]
+
+homes = [
+    Home(0, 300, 50, 50, image_dir + "goal.gif"),
+    Home(-100, 300, 50, 50, image_dir + "goal.gif"),
+    Home(-200, 300, 50, 50, image_dir + "goal.gif"),
+    Home(100, 300, 50, 50, image_dir + "goal.gif"),
+    Home(200, 300, 50, 50, image_dir + "goal.gif")
+]
+
+sprites = level_1 + homes
 sprites.append(player)
 
 wn.listen()
@@ -177,14 +237,22 @@ while True:
         sprite.render(pen)
         sprite.update()
 
+    timer.render(player.time_remaining, pen)
+
+    pen.goto(-250, -350)
+    pen.shape(image_dir + "frog_small.gif")
+    for life in range(player.lives):
+        pen.goto(-275 + (life * 30), -350)
+        pen.stamp()
+
     player.dx = 0
     player.collision = False
 
     for sprite in sprites:
         if player.is_collision(sprite):
             if isinstance(sprite, Car):
-                player.x = 0
-                player.y = -300
+                player.lives -= 1
+                player.go_home()
                 break
             elif isinstance(sprite, Log):
                 player.dx = sprite.dx
@@ -195,14 +263,27 @@ while True:
                 player.collision = True
                 break
             elif isinstance(sprite, Home):
-                player.x = 0
-                player.y = -300
-                sprite.image = image_dir + "frog_home.gif"
+                player.go_home()
+                player.frogs_home += 1
+                sprite.image = image_dir + "frog.gif"
                 break
     
     if player.y > 0 and not player.collision:
-        player.x = 0
-        player.y = -300
+        player.lives -= 1
+        player.go_home()
+
+    if player.frogs_home == 5:
+        player.go_home()
+        player.frogs_home = 0
+        for home in homes:
+            home.image = image_dir + "goal.gif"
+
+    if player.lives == 0:
+        player.go_home()
+        player.frogs_home = 0
+        for home in homes:
+            home.image = image_dir + "goal.gif"
+        player.lives = 3
     
     wn.update()
     pen.clear()
